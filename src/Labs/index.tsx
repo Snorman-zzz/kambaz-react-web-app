@@ -3,6 +3,7 @@ import {Navigate, Route, Routes} from "react-router";
 import Lab2 from "./Lab2";
 import Lab3 from "./Lab3";
 import TOC from "./TOC";
+import { Link } from "react-router-dom";
 
 function Index() {
     return null;
@@ -16,6 +17,7 @@ export default function Labs() {
             <a id="wd-github" href="https://github.com/Snorman-zzz/kambaz-react-web-app">
                 GitHub Repository
             </a>
+            <Link to="/Labs" id="wd-labs-link">Back to Labs Landing</Link>
             <Index />
             <Routes>
                 <Route path="/" element={<Navigate to="Lab1" />} />
