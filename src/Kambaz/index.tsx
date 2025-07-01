@@ -3,10 +3,12 @@ import {Navigate, Route, Routes} from "react-router";
 import Dashboard from "./Dashboard.tsx";
 import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
+import { Link } from "react-router-dom";
 
 export default function Kambaz() {
     return (
         <div id="wd-kambaz">
+            <Link to="/Labs" id="wd-labs-link">Back to Labs Landing</Link>
             <table>
                 <tr>
                     <td valign="top">
