@@ -14,7 +14,14 @@ export default function Assignments() {
                         A1 - ENV + HTML
                     </a> </li>
                 <li className="wd-assignment-list-item">
-                    {/* Complete On Your Own */}
+                    <a href="#/Kambaz/Courses/1234/Assignments/124" className="wd-assignment-link">
+                        A2 – CSS + BOOTSTRAP
+                    </a>
+                </li>
+                <li className="wd-assignment-list-item">
+                    <a href="#/Kambaz/Courses/1234/Assignments/125" className="wd-assignment-link">
+                        A3 – REACT + ROUTER
+                    </a>
                 </li>
             </ul>
         </div>

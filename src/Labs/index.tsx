@@ -10,8 +10,9 @@ function Index() {
 
 export default function Labs() {
     return (
+        // ... existing code ...
         <div id="wd-labs">
-            <h1>Mingze Yuan</h1>
+            <h3 id="wd-student-id">Mingze Yuan – Section 202560</h3>
             <TOC />
             <a id="wd-github" href="https://github.com/Snorman-zzz/kambaz-react-web-app">
                 GitHub Repository

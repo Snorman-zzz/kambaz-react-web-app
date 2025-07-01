@@ -17,8 +17,32 @@ export default function Dashboard() {
                         </div>
                     </Link>
                 </div>
-                <div className="wd-dashboard-course"> ... </div>
-                <div className="wd-dashboard-course"> ... </div>
+                <div className="wd-dashboard-course">
+                    <Link to="/Kambaz/Courses/2345/Home" className="wd-dashboard-course-link">
+                        <img src="/images/nodejs.jpg" width={200} />
+                        <div>
+                            <h5>CS2345 Node JS</h5>
+                            <p className="wd-dashboard-course-title">
+                                Server-side JavaScript
+                            </p>
+                            <button>Go</button>
+                        </div>
+                    </Link>
+                </div>
+                <div className="wd-dashboard-course">
+                    <Link to="/Kambaz/Courses/3456/Home" className="wd-dashboard-course-link">
+                        <img src="/images/mongodb.jpg" width={200} />
+                        <div>
+                            <h5>CS3456 MongoDB</h5>
+                            <p className="wd-dashboard-course-title">
+                                NoSQL Databases
+                            </p>
+                            <button>Go</button>
+                        </div>
+                    </Link>
+                </div>
             </div>
         </div>
     );}
+
+    
