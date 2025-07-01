@@ -1,5 +1,5 @@
 import Signin from "./Signin";
-import {Navigate, Route, Routes} from "react-router";
+import {Navigate, Route, Routes} from "react-router-dom";
 import Profile from "./Profile.tsx";
 import Signup from "./Signup.tsx";
 export default function Account() {

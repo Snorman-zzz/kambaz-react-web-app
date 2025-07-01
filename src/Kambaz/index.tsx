@@ -1,5 +1,5 @@
 import Account from "./Account";
-import {Navigate, Route, Routes} from "react-router";
+import {Navigate, Route, Routes} from "react-router-dom";
 import Dashboard from "./Dashboard.tsx";
 import KambazNavigation from "./Navigation";
 import Courses from "./Courses";
@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 export default function Kambaz() {
     return (
         <div id="wd-kambaz">
-            <Link to="/Labs" id="wd-labs-link">Back to Labs Landing</Link>
+            <Link to="/Labs" id="wd-labs-link">Back to Labs Exercises</Link>
             <table>
                 <tr>
                     <td valign="top">

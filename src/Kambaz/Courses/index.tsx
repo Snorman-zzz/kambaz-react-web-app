@@ -1,5 +1,5 @@
 import CourseNavigation from "./Navigation.tsx";
-import {Navigate, Route, Routes} from "react-router";
+import {Navigate, Route, Routes} from "react-router-dom";
 import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
