@@ -199,9 +199,8 @@ export default function Lab1() {
                     <input type="date"
                            value="2000-01-21"
                            id="wd-text-fields-dob" /><br />
-+                   <label htmlFor="wd-file-upload"> Upload a file: </label>
-+                   <input type="file" id="wd-file-upload" /><br />
- // ... existing code ...
+                   <label htmlFor="wd-file-upload"> Upload a file: </label>
+                   <input type="file" id="wd-file-upload" /><br />
                 </form>
             </div>
             <h4>Anchor tag</h4>
