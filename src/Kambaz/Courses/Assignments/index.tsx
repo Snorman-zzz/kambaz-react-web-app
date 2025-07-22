@@ -2,28 +2,25 @@ import { Button, InputGroup, FormControl, ListGroup, Badge } from "react-bootstr
 import { FaSearch, FaPlus, FaFileAlt } from "react-icons/fa";
 import { BsGripVertical, BsThreeDotsVertical, BsChevronDown } from "react-icons/bs";
 import GreenCheckmark from "../Modules/GreenCheckmark";
+import { useParams, Link } from "react-router-dom";
+import * as db from "../../Database";
+
+interface Assignment {
+  _id: string;
+  title: string;
+  course: string;
+  available?: string;
+  due?: string;
+  points?: number;
+}
 
 export default function Assignments() {
-    const assignments = [
-        {
-            id: 123,
-            title: "A1 – ENV + HTML",
-            due: "May 13 at 11:59pm",
-            available: "May 6 at 12:00am"
-        },
-        {
-            id: 124,
-            title: "A2 – CSS + BOOTSTRAP",
-            due: "May 20 at 11:59pm",
-            available: "May 13 at 12:00am"
-        },
-        {
-            id: 125,
-            title: "A3 – REACT + ROUTER",
-            due: "May 27 at 11:59pm",
-            available: "May 20 at 12:00am"
-        }
-    ];
+    const { cid } = useParams(); // course id from the URL, may be undefined when viewing all courses
+
+    // Filter assignments by course when a course id is present; otherwise show all assignments
+    const assignments = (db.assignments as Assignment[]).filter(
+        a => !cid || a.course === cid
+    );
 
     return (
         <div id="wd-assignments" className="pt-2">
@@ -52,17 +49,20 @@ export default function Assignments() {
                 </ListGroup.Item>
 
                 {assignments.map(a => (
-                    <ListGroup.Item key={a.id} className="wd-assignment-item p-3 border-top">
+                    <ListGroup.Item key={a._id} className="wd-assignment-item p-3 border-top">
                         <div className="d-flex align-items-start">
                             <BsGripVertical className="me-3 fs-5" />
                             <FaFileAlt className="me-3 fs-5 text-success" />
                             <div className="flex-fill">
-                                <a href={`#/Kambaz/Courses/1234/Assignments/${a.id}`} className="fw-bold text-decoration-none">
+                                <Link to={`/Kambaz/Courses/${a.course}/Assignments/${a._id}`} className="fw-bold text-decoration-none">
                                     {a.title}
-                                </a>
+                                </Link>
                                 <br />
                                 <small className="text-muted">
-                                    Multiple Modules | Not available until {a.available} | <strong>Due</strong> {a.due} | 100 pts
+                                    Multiple Modules
+                                    {a.available && <> | Not available until {a.available}</>} |
+                                    {a.due && <> <strong>Due</strong> {a.due}</>} |
+                                    {a.points ?? 100} pts
                                 </small>
                             </div>
                             <div className="ms-2 pt-1 d-flex align-items-start">

@@ -1,5 +1,5 @@
 import CourseNavigation from "./Navigation.tsx";
-import {Navigate, Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes, useLocation, useParams} from "react-router-dom";
 import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
@@ -8,23 +8,24 @@ import { FaBars } from "react-icons/fa";
 import { Offcanvas, Button } from "react-bootstrap";
 import { useState } from "react";
 import PeopleTable from "./People/Table";
+import {courses} from "../Database";
 
 export default function Courses() {
     const [showCourseNav, setShowCourseNav] = useState(false);
+    const { cid } = useParams();
+    const course = courses.find((course) => course._id === cid);
+    const { pathname } = useLocation();
     return (
         <div id="wd-courses">
-            {/* Header */}
             <div className="d-flex align-items-center justify-content-between pt-2">
                 <Button variant="link" className="d-md-none text-dark" onClick={() => setShowCourseNav(true)}>
                     <FaBars className="fs-3" />
                 </Button>
-                <h2 className="text-danger flex-fill text-center m-0">Course 1234</h2>
-                {/* placeholder for right icon maybe */}
+                <h2 className="text-danger flex-fill text-center m-0">{course && course.name} &gt; {pathname.split("/")[4]}</h2>
                 <span className="d-md-none" style={{ width: "40px" }}></span>
             </div>
             <hr/>
 
-            {/* Offcanvas course navigation */}
             <Offcanvas show={showCourseNav} onHide={() => setShowCourseNav(false)} placement="top" className="h-auto">
                 <Offcanvas.Header closeButton />
                 <Offcanvas.Body>
