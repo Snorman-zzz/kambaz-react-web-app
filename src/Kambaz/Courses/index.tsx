@@ -1,5 +1,5 @@
 import CourseNavigation from "./Navigation.tsx";
-import {Navigate, Route, Routes, useLocation, useParams} from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import Modules from "./Modules";
 import Home from "./Home";
 import Assignments from "./Assignments";
@@ -8,20 +8,41 @@ import { FaBars } from "react-icons/fa";
 import { Offcanvas, Button } from "react-bootstrap";
 import { useState } from "react";
 import PeopleTable from "./People/Table";
-import {courses} from "../Database";
+import { useSelector } from "react-redux";
+import type { Course as CourseType } from "./reducer";
+
+interface RootState {
+  coursesReducer: { courses: CourseType[] };
+  accountReducer: { currentUser: { _id: string; role?: string } | null };
+  enrollmentsReducer: { enrollments: { user: string; course: string }[] };
+}
 
 export default function Courses() {
     const [showCourseNav, setShowCourseNav] = useState(false);
     const { cid } = useParams();
-    const course = courses.find((course) => course._id === cid);
-    const { pathname } = useLocation();
+    const location = useLocation();
+    const { courses } = useSelector((state: RootState) => state.coursesReducer);
+    const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+    const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
+    const isFaculty = currentUser?.role === "FACULTY";
+
+    const enrolled = enrollments.some(
+      (e) => e.user === currentUser?._id && e.course === cid
+    );
+
+    if (!isFaculty && !enrolled) {
+      return <Navigate to="/Kambaz/Dashboard" />;
+    }
+
+    const course = courses.find((c) => c._id === cid);
+    const pathname = location.pathname;
     return (
         <div id="wd-courses">
             <div className="d-flex align-items-center justify-content-between pt-2">
                 <Button variant="link" className="d-md-none text-dark" onClick={() => setShowCourseNav(true)}>
                     <FaBars className="fs-3" />
                 </Button>
-                <h2 className="text-danger flex-fill text-center m-0">{course && course.name} &gt; {pathname.split("/")[4]}</h2>
+                <h2 className="text-danger flex-fill text-center m-0">{course?.name} &gt; {pathname.split("/")[4]}</h2>
                 <span className="d-md-none" style={{ width: "40px" }}></span>
             </div>
             <hr/>

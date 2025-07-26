@@ -1,24 +1,41 @@
 import { Form, Row, Col } from "react-bootstrap";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { addAssignment, updateAssignment } from "./reducer";
 import * as db from "../../Database";
+import React from "react";
+import type { Assignment } from "./reducer";
 
-interface Assignment {
-  _id: string;
-  title: string;
-  description?: string;
-  course: string;
-  points?: number;
-  available?: string; // ISO yyyy-mm-dd
-  due?: string; // ISO yyyy-mm-dd
+interface RootState {
+  assignmentsReducer: {
+    assignments: Assignment[];
+  };
+  accountReducer: {
+    currentUser: { role?: string } | null;
+  };
 }
 
 export default function AssignmentEditor() {
     const { cid, aid } = useParams();
-    const assignments = db.assignments as Assignment[];
-    const assignment = assignments.find(a => a._id === aid && (!cid || a.course === cid));
+    const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
+    const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+    const isFaculty = currentUser?.role === "FACULTY";
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    if (!assignment) {
-        return <p>Assignment not found.</p>;
+    const existing = assignments.find((a) => a._id === aid);
+    const initial: Assignment = existing ?? {
+      _id: "new",
+      title: "New Assignment",
+      course: cid ?? "",
+      description: "",
+      points: 100,
+    } as Assignment;
+
+    const [assignment, setAssignment] = React.useState<Assignment>(initial);
+
+    if (!isFaculty) {
+      return <p>Unauthorized.</p>;
     }
 
     return (
@@ -121,7 +138,22 @@ export default function AssignmentEditor() {
 
             <div className="d-flex justify-content-end gap-2 mt-4">
                 <Link to={`/Kambaz/Courses/${assignment.course}/Assignments`} id="wd-cancel" className="btn btn-secondary">Cancel</Link>
-                <Link to={`/Kambaz/Courses/${assignment.course}/Assignments`} id="wd-save" className="btn btn-danger">Save</Link>
+                <button
+                  type="button"
+                  id="wd-save"
+                  className="btn btn-danger"
+                  onClick={() => {
+                    if (assignment._id === "new") {
+                      const { _id, ...rest } = assignment;
+                      dispatch(addAssignment({ ...rest } as Omit<Assignment, "_id">));
+                    } else {
+                      dispatch(updateAssignment(assignment));
+                    }
+                    navigate(`/Kambaz/Courses/${cid}/Assignments`);
+                  }}
+                >
+                  Save
+                </button>
             </div>
         </Form>
     );

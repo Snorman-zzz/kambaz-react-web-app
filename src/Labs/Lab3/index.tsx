@@ -30,12 +30,23 @@ import Styles from "./Styles.tsx";
 import Add from "./Add.tsx";
 import Square from "./Square.tsx";
 import Highlight from "./Highlight.tsx";
+import { ListGroup } from "react-bootstrap";
+import { useSelector } from "react-redux";
 
 export default function Lab3() {
+    interface Todo { id: string; title: string }
+    interface RootState { todosReducer: { todos: Todo[] } }
+    const { todos } = useSelector((state: RootState) => state.todosReducer);
+
     console.log('Hello World!');
     return (
         <div id="wd-lab3">
             <h2>Lab 3</h2>
+            <ListGroup className="mb-3">
+                {todos.map((todo) => (
+                    <ListGroup.Item key={todo.id}>{todo.title}</ListGroup.Item>
+                ))}
+            </ListGroup>
             <h3>JavaScript</h3>
             <VariablesAndConstants/>
             <VariableTypes/>
