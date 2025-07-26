@@ -29,9 +29,6 @@ interface RootState {
   modulesReducer: {
     modules: Module[];
   };
-  accountReducer: {
-    currentUser: { role?: string } | null;
-  };
 }
 
 export default function Modules() {
@@ -39,12 +36,9 @@ export default function Modules() {
     const [moduleName, setModuleName] = useState("");
 
     const { modules } = useSelector((state: RootState) => state.modulesReducer);
-    const { currentUser } = useSelector((state: RootState) => state.accountReducer);
-    const isFaculty = currentUser?.role === "FACULTY";
     const dispatch = useDispatch();
     return (
         <div>
-            {isFaculty && (
             <ModulesControls
               moduleName={moduleName}
               setModuleName={setModuleName}
@@ -54,7 +48,6 @@ export default function Modules() {
                 setModuleName("");
               }}
             />
-            )}
             <br /><br /><br />
             <ListGroup className="rounded-0" id="wd-modules">
 
@@ -66,7 +59,7 @@ export default function Modules() {
                             <div className="wd-title p-3 ps-2 bg-secondary">
                                 <BsGripVertical className="me-2 fs-3" />
                                 {!module.editing && module.name}
-                                {isFaculty && module.editing && (
+                                {module.editing && (
                                     <Form.Control
                                         className="w-50 d-inline-block"
                                         onChange={(e) => dispatch(updateModule({ ...module, name: e.target.value }))}
@@ -78,13 +71,11 @@ export default function Modules() {
                                         defaultValue={module.name}
                                     />
                                 )}
-                                {isFaculty && (
                                 <ModuleControlButtons
                                   moduleId={module._id}
                                   deleteModule={(id) => dispatch(deleteModule(id))}
                                   editModule={(id) => dispatch(editModule(id))}
                                 />
-                                )}
                             </div>
                             {module.lessons && (
                                 <ListGroup className=

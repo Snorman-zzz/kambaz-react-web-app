@@ -1,51 +1,42 @@
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button, Form } from "react-bootstrap";
-import { useSelector, useDispatch } from "react-redux";
-import { addCourse, deleteCourse, updateCourse, type Course as CourseType } from "./Courses/reducer";
-import { enrollCourse, unenrollCourse } from "./Courses/enrollmentsReducer";
-// Database import removed – enrollments now from Redux
-import { useState } from "react";
+import { useSelector } from "react-redux";
+import * as db from "./Database";
 
+interface Course { _id: string; name: string; description: string }
+
+interface User { _id: string; role?: string; }
 interface RootState {
-  coursesReducer: { courses: CourseType[] };
-  accountReducer: { currentUser: { _id: string; role?: string } | null };
-  enrollmentsReducer: { enrollments: { user: string; course: string }[] };
+  accountReducer: {
+    currentUser: User | null;
+  };
 }
 
-export default function Dashboard() {
-    const dispatch = useDispatch();
-    const { courses } = useSelector((state: RootState) => state.coursesReducer);
-    const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
+interface DashboardProps {
+    courses: Course[];
+    course: Course;
+    setCourse: (c: Course) => void;
+    addNewCourse: () => void;
+    deleteCourse: (id: string) => void;
+    updateCourse: () => void;
+}
+
+export default function Dashboard({ courses, course, setCourse, addNewCourse, deleteCourse, updateCourse }: DashboardProps) {
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
-    const isFaculty = currentUser?.role === "FACULTY";
-
-    const [course, setCourse] = useState<CourseType>({ _id: "0", name: "New Course", description: "New Description" });
-
-    const [showAll, setShowAll] = useState(false);
-
-    const userEnrollments = (cid: string) =>
-      enrollments.some((e) => e.user === currentUser?._id && e.course === cid);
+    const { enrollments } = db;
 
     const filteredCourses = currentUser
-      ? showAll
-        ? courses
-        : courses.filter((c) => userEnrollments(c._id))
-      : [];
+        ? courses.filter((c) =>
+            enrollments.some(
+                (e: { user: string; course: string }) => e.user === currentUser._id && e.course === c._id
+          ))
+        : [];
 
-    const toggleEnrollView = () => setShowAll(!showAll);
-
-    const addNewCourse = () => dispatch(addCourse({ name: course.name, description: course.description }));
-    const doUpdateCourse = () => dispatch(updateCourse(course));
-    const doDelete = (id: string) => dispatch(deleteCourse(id));
+    const isFaculty = currentUser?.role === 'FACULTY';
 
     return (
         <div id="wd-dashboard" className="pt-3">
-            <div className="d-flex justify-content-between align-items-center">
-              <h1 id="wd-dashboard-title">Dashboard</h1>
-              <Button variant="primary" onClick={toggleEnrollView} className="ms-auto">
-                {showAll ? "My Enrollments" : "All Courses"}
-              </Button>
-            </div>
+            <h1 id="wd-dashboard-title">Dashboard</h1>
             <hr/>
             {isFaculty && (
                 <>
@@ -54,7 +45,7 @@ export default function Dashboard() {
                             id="wd-add-new-course-click"
                             onClick={addNewCourse}> Add </button>
                     <button className="btn btn-warning float-end me-2"
-                            onClick={doUpdateCourse} id="wd-update-course-click">
+                            onClick={updateCourse} id="wd-update-course-click">
                         Update
                     </button>
                 </h5>
@@ -90,47 +81,15 @@ export default function Dashboard() {
                                             {course.description}
                                         </Card.Text>
                                         <Button variant="primary">Go</Button>
-                                        {currentUser && (
-                                          userEnrollments(course._id) ? (
-                                            <Button
-                                              variant="danger"
-                                              className="ms-2"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                dispatch(
-                                                  unenrollCourse({
-                                                    user: currentUser._id,
-                                                    course: course._id,
-                                                  })
-                                                );
-                                              }}
-                                            >
-                                              Unenroll
-                                            </Button>
-                                          ) : (
-                                            <Button
-                                              variant="success"
-                                              className="ms-2"
-                                              onClick={(e) => {
-                                                e.preventDefault();
-                                                dispatch(
-                                                  enrollCourse({
-                                                    user: currentUser._id,
-                                                    course: course._id,
-                                                  })
-                                                );
-                                              }}
-                                            >
-                                              Enroll
-                                            </Button>
-                                          )
-                                        )}
                                         {isFaculty && (
-                                            <button onClick={(event) => {
-                                                event.preventDefault();
-                                                doDelete(course._id);
-                                            }} className="btn btn-danger float-end"
-                                                    id="wd-delete-course-click">
+                                            <button
+                                                onClick={(event) => {
+                                                    event.preventDefault();
+                                                    deleteCourse(course._id);
+                                                }}
+                                                className="btn btn-danger float-end"
+                                                id="wd-delete-course-click"
+                                            >
                                                 Delete
                                             </button>
                                         )}

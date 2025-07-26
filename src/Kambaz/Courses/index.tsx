@@ -8,34 +8,14 @@ import { FaBars } from "react-icons/fa";
 import { Offcanvas, Button } from "react-bootstrap";
 import { useState } from "react";
 import PeopleTable from "./People/Table";
-import { useSelector } from "react-redux";
-import type { Course as CourseType } from "./reducer";
 
-interface RootState {
-  coursesReducer: { courses: CourseType[] };
-  accountReducer: { currentUser: { _id: string; role?: string } | null };
-  enrollmentsReducer: { enrollments: { user: string; course: string }[] };
-}
+interface Course { _id: string; name: string; description: string }
 
-export default function Courses() {
+export default function Courses({ courses }: { courses: Course[] }) {
     const [showCourseNav, setShowCourseNav] = useState(false);
     const { cid } = useParams();
-    const location = useLocation();
-    const { courses } = useSelector((state: RootState) => state.coursesReducer);
-    const { currentUser } = useSelector((state: RootState) => state.accountReducer);
-    const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
-    const isFaculty = currentUser?.role === "FACULTY";
-
-    const enrolled = enrollments.some(
-      (e) => e.user === currentUser?._id && e.course === cid
-    );
-
-    if (!isFaculty && !enrolled) {
-      return <Navigate to="/Kambaz/Dashboard" />;
-    }
-
     const course = courses.find((c) => c._id === cid);
-    const pathname = location.pathname;
+    const { pathname } = useLocation();
     return (
         <div id="wd-courses">
             <div className="d-flex align-items-center justify-content-between pt-2">
