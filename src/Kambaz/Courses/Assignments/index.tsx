@@ -3,9 +3,8 @@ import { FaSearch, FaPlus, FaFileAlt, FaTrash } from "react-icons/fa";
 import { BsGripVertical, BsThreeDotsVertical, BsChevronDown } from "react-icons/bs";
 import GreenCheckmark from "../Modules/GreenCheckmark";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import * as db from "../../Database";
 import { useSelector, useDispatch } from "react-redux";
-import { addAssignment, deleteAssignment } from "./reducer";
+import { deleteAssignment } from "./reducer";
 
 interface Assignment {
   _id: string;

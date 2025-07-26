@@ -14,7 +14,7 @@ interface Module {
   name: string;
   description?: string;
   course: string;
-  lessons: Lesson[];
+  lessons?: Lesson[];
   editing?: boolean;
 }
 

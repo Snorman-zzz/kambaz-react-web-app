@@ -2,7 +2,6 @@ import { Form, Row, Col } from "react-bootstrap";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { addAssignment, updateAssignment } from "./reducer";
-import * as db from "../../Database";
 import React from "react";
 import type { Assignment } from "./reducer";
 
@@ -32,7 +31,7 @@ export default function AssignmentEditor() {
       points: 100,
     } as Assignment;
 
-    const [assignment, setAssignment] = React.useState<Assignment>(initial);
+    const [assignment] = React.useState<Assignment>(initial);
 
     if (!isFaculty) {
       return <p>Unauthorized.</p>;
