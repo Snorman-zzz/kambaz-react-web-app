@@ -3,7 +3,7 @@ import { Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { addCourse, deleteCourse, updateCourse, type Course as CourseType } from "./Courses/reducer";
 import { enrollCourse, unenrollCourse } from "./Courses/enrollmentsReducer";
-import * as db from "./Database";
+// Database import removed – enrollments now from Redux
 import { useState } from "react";
 
 interface RootState {
@@ -17,7 +17,6 @@ export default function Dashboard() {
     const { courses } = useSelector((state: RootState) => state.coursesReducer);
     const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
-    const { enrollments: dbEnrollments } = db;
     const isFaculty = currentUser?.role === "FACULTY";
 
     const [course, setCourse] = useState<CourseType>({ _id: "0", name: "New Course", description: "New Description" });
@@ -25,9 +24,7 @@ export default function Dashboard() {
     const [showAll, setShowAll] = useState(false);
 
     const userEnrollments = (cid: string) =>
-      enrollments.some(
-        (e) => e.user === currentUser?._id && e.course === cid
-      );
+      enrollments.some((e) => e.user === currentUser?._id && e.course === cid);
 
     const filteredCourses = currentUser
       ? showAll
