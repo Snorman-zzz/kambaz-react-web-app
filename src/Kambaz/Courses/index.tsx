@@ -7,13 +7,14 @@ import AssignmentEditor from "./Assignments/Editor.tsx";
 import { FaBars } from "react-icons/fa";
 import { Offcanvas, Button } from "react-bootstrap";
 import { useState } from "react";
+import { useSelector } from "react-redux";
+import type { Course } from "./reducer";
 import PeopleTable from "./People/Table";
 
-interface Course { _id: string; name: string; description: string }
-
-export default function Courses({ courses }: { courses: Course[] }) {
+export default function Courses() {
     const [showCourseNav, setShowCourseNav] = useState(false);
     const { cid } = useParams();
+    const { courses } = useSelector((state: { coursesReducer: { courses: Course[] } }) => state.coursesReducer);
     const course = courses.find((c) => c._id === cid);
     const { pathname } = useLocation();
     return (

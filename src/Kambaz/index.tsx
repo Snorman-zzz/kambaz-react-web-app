@@ -9,32 +9,9 @@ import { FaBars } from "react-icons/fa";
 import "./styles.css";
 
 import { useState } from "react";
-import * as db from "./Database";
-
-interface Course { _id: string; name: string; description: string }
 
 export default function Kambaz() {
     const [showNav, setShowNav] = useState(false);
-
-    const [courses, setCourses] = useState<Course[]>(db.courses as Course[]);
-    const [course, setCourse] = useState<Course>({
-        _id: "0",
-        name: "New Course",
-        description: "New Description"
-    });
-
-    const addNewCourse = () => {
-        const newCourse: Course = { ...course, _id: crypto.randomUUID() };
-        setCourses([...courses, newCourse]);
-    };
-
-    const deleteCourse = (id: string) => {
-        setCourses(courses.filter((c) => c._id !== id));
-    };
-
-    const updateCourse = () => {
-        setCourses(courses.map((c) => (c._id === course._id ? course : c)));
-    };
 
     return (
         <div id="wd-kambaz">
@@ -57,15 +34,8 @@ export default function Kambaz() {
                         <Routes>
                             <Route path="/" element={<Navigate to="/Kambaz/Account"/>}/>
                             <Route path="/Account/*" element={<Account/>}/>
-                            <Route path="/Dashboard" element={<Dashboard
-                                courses={courses}
-                                course={course}
-                                setCourse={setCourse}
-                                addNewCourse={addNewCourse}
-                                deleteCourse={deleteCourse}
-                                updateCourse={updateCourse}
-                            />}/>
-                            <Route path="/Courses/:cid/*" element={<Courses courses={courses} />} />
+                            <Route path="/Dashboard" element={<Dashboard />}/>
+                            <Route path="/Courses/:cid/*" element={<Courses />} />
                             <Route path="/Calendar" element={<h1>Calendar</h1>} />
                             <Route path="/Inbox" element={<h1>Inbox</h1>} />
                         </Routes>

@@ -1,30 +1,115 @@
-import { Link } from "react-router-dom";
-import { Form, Button, Row } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Form, Button, FormControl } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { setCurrentUser } from "./reducer";
+
+interface User {
+  _id: string;
+  username: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  email?: string;
+  role?: string;
+}
+
+interface RootState {
+  accountReducer: {
+    currentUser: User | null;
+  };
+}
+
 export default function Profile() {
-    return (
-        <div id="wd-profile-screen">
-            <h1 className="mb-4">Profile</h1>
-            <Form>
-                <Form.Control defaultValue="alice" placeholder="username" className="mb-3" />
-                <Form.Control defaultValue="123" type="password" placeholder="password" className="mb-3" />
-                <Row className="mb-3 g-3">
-                    <div className="col">
-                        <Form.Control defaultValue="Alice" placeholder="First Name" />
-                    </div>
-                    <div className="col">
-                        <Form.Control defaultValue="Wonderland" placeholder="Last Name" />
-                    </div>
-                </Row>
-                <Form.Control type="date" defaultValue="2000-01-01" className="mb-3" />
-                <Form.Control type="email" defaultValue="alice@wonderland" className="mb-3" />
-                <Form.Select defaultValue="USER" className="mb-4">
-                    <option value="USER">User</option>
-                    <option value="ADMIN">Admin</option>
-                    <option value="FACULTY">Faculty</option>
-                    <option value="STUDENT">Student</option>
-                </Form.Select>
-                <Button as={Link as any} to="/Kambaz/Account/Signin" variant="danger" className="w-100">Signout</Button>
-            </Form>
-        </div>
-    );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+
+  const [profile, setProfile] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate("/Kambaz/Account/Signin");
+    } else {
+      setProfile(currentUser);
+    }
+  }, [currentUser, navigate]);
+
+  const signout = () => {
+    dispatch(setCurrentUser(null));
+    navigate("/Kambaz/Account/Signin");
+  };
+
+  if (!profile) return null; // redirecting
+
+  return (
+    <div id="wd-profile-screen">
+      <h1 className="mb-4">Profile</h1>
+      <Form>
+        <FormControl
+          defaultValue={profile.username}
+          placeholder="username"
+          className="mb-3"
+          id="wd-username"
+          onChange={(e) => setProfile({ ...profile, username: e.target.value })}
+        />
+        <FormControl
+          defaultValue={profile.password}
+          placeholder="password"
+          type="password"
+          className="mb-3"
+          id="wd-password"
+          onChange={(e) => setProfile({ ...profile, password: e.target.value })}
+        />
+        <FormControl
+          defaultValue={profile.firstName}
+          placeholder="First Name"
+          className="mb-3"
+          id="wd-firstname"
+          onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
+        />
+        <FormControl
+          defaultValue={profile.lastName}
+          placeholder="Last Name"
+          className="mb-3"
+          id="wd-lastname"
+          onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
+        />
+        <FormControl
+          defaultValue={profile.dob}
+          type="date"
+          className="mb-3"
+          id="wd-dob"
+          onChange={(e) => setProfile({ ...profile, dob: e.target.value })}
+        />
+        <FormControl
+          defaultValue={profile.email}
+          type="email"
+          className="mb-3"
+          id="wd-email"
+          onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+        />
+        <Form.Select
+          defaultValue={profile.role}
+          className="mb-4"
+          id="wd-role"
+          onChange={(e) => setProfile({ ...profile, role: e.target.value })}
+        >
+          <option value="USER">User</option>
+          <option value="ADMIN">Admin</option>
+          <option value="FACULTY">Faculty</option>
+          <option value="STUDENT">Student</option>
+        </Form.Select>
+        <Button
+          variant="danger"
+          className="w-100"
+          id="wd-signout-btn"
+          onClick={signout}
+        >
+          Sign out
+        </Button>
+      </Form>
+    </div>
+  );
 }
