@@ -14,7 +14,7 @@ interface Module {
   name: string;
   description?: string;
   course: string;
-  lessons: Lesson[];
+  lessons?: Lesson[];
   editing?: boolean;
 }
 
@@ -46,7 +46,7 @@ const modulesSlice = createSlice({
     deleteModule: (state, { payload: moduleId }: PayloadAction<string>) => {
       state.modules = state.modules.filter((m) => m._id !== moduleId);
     },
-    updateModule: (state, { payload: module }: PayloadAction<Module>) => {
+    updateModule: (state, { payload: module }: PayloadAction<Partial<Module> & { _id: string }>) => {
       state.modules = state.modules.map((m) =>
         m._id === module._id ? { ...m, ...module } : m
       );
