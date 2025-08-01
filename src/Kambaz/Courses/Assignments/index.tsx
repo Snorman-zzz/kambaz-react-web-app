@@ -5,7 +5,8 @@ import { FaTrash } from "react-icons/fa";
 import GreenCheckmark from "../Modules/GreenCheckmark";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteAssignment, type Assignment } from "./reducer";
+import { setAssignments, deleteAssignment, type Assignment } from "./reducer";
+import * as assignmentsClient from "./client";
 import React from "react";
 
 interface RootState {
@@ -17,6 +18,14 @@ export default function Assignments() {
     const { cid } = useParams(); // course id from the URL, may be undefined when viewing all courses
 
     const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
+
+    React.useEffect(() => {
+        if (cid) {
+            assignmentsClient.findAssignmentsForCourse(cid).then((data) => {
+                dispatch(setAssignments(data));
+            });
+        }
+    }, [cid]);
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -116,7 +125,11 @@ export default function Assignments() {
                      <Button
                        variant="danger"
                        onClick={() => {
-                         if (deleteId) dispatch(deleteAssignment(deleteId));
+                         if (deleteId) {
+                           assignmentsClient.deleteAssignment(deleteId).then(()=>{
+                             dispatch(deleteAssignment(deleteId));
+                           });
+                         }
                          setDeleteId(null);
                        }}
                      >

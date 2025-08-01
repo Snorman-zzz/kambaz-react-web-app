@@ -2,6 +2,7 @@ import { Form, Row, Col, Button } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { addAssignment, updateAssignment, type Assignment } from "./reducer";
+import * as assignmentsClient from "./client";
 import React from "react";
 
 export default function AssignmentEditor() {
@@ -28,20 +29,20 @@ export default function AssignmentEditor() {
     }
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (!cid) return;
     if (isNew) {
-      dispatch(
-        addAssignment({
-          title: form.title,
-          description: form.description,
-          course: cid!,
-          points: form.points,
-          available: form.available,
-          due: form.due,
-        })
-      );
+      const saved = await assignmentsClient.createAssignmentForCourse(cid, {
+        title: form.title,
+        description: form.description,
+        points: form.points,
+        available: form.available,
+        due: form.due,
+      });
+      dispatch(addAssignment(saved));
     } else {
-      dispatch(updateAssignment({ ...form }));
+      const updated = await assignmentsClient.updateAssignment(form);
+      dispatch(updateAssignment(updated));
     }
     navigate(`/Kambaz/Courses/${cid}/Assignments`);
   };

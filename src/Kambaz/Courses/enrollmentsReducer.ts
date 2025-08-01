@@ -18,6 +18,9 @@ const enrollmentsSlice = createSlice({
   name: "enrollments",
   initialState,
   reducers: {
+    setEnrollments: (state, { payload }: PayloadAction<Enrollment[]>) => {
+      state.enrollments = payload;
+    },
     enrollCourse: (state, { payload }: PayloadAction<Enrollment>) => {
       // prevent duplicates
       if (!state.enrollments.some((e) => e.user === payload.user && e.course === payload.course)) {
@@ -32,5 +35,5 @@ const enrollmentsSlice = createSlice({
   },
 });
 
-export const { enrollCourse, unenrollCourse } = enrollmentsSlice.actions;
+export const { setEnrollments, enrollCourse, unenrollCourse } = enrollmentsSlice.actions;
 export default enrollmentsSlice.reducer; 

@@ -3,17 +3,15 @@ import { Form, Button } from "react-bootstrap";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { setCurrentUser } from "./reducer";
-import * as db from "../Database";
+import * as client from "./client";
 
 export default function Signin() {
     const [credentials, setCredentials] = useState<{ username?: string; password?: string }>({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const signin = () => {
-        const user = db.users.find(
-            (u: any) => u.username === credentials.username && u.password === credentials.password
-        );
+    const signin = async () => {
+        const user = await client.signin(credentials);
         if (!user) return;
         dispatch(setCurrentUser(user));
         navigate("/Kambaz/Dashboard");

@@ -4,9 +4,11 @@ import ModulesControls from "./ModulesControls";
 import ModuleControlButtons from "./ModuleControlButtons";
 import LessonControlButtons from "./LessonControlButtons";
 import { useParams } from "react-router";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addModule, deleteModule, editModule, updateModule } from "./reducer";
+import {addModule, deleteModule, editModule, setModules, updateModule} from "./reducer";
+import * as coursesClient from "../client";
+import * as modulesClient from "./client";
 
 // Define the expected shape of the data coming from the JSON file
 interface Lesson {
@@ -37,22 +39,44 @@ export default function Modules() {
 
     const { modules } = useSelector((state: RootState) => state.modulesReducer);
     const dispatch = useDispatch();
+    const fetchModules = async () => {
+        const modules = await coursesClient.findModulesForCourse(cid as string);
+        dispatch(setModules(modules));
+    };
+    useEffect(() => {
+        fetchModules();
+    }, []);
+
+    const createModuleForCourse = async () => {
+        if (!cid) return;
+        const newModule = { name: moduleName, course: cid };
+        const module = await coursesClient.createModuleForCourse(cid, newModule);
+        dispatch(addModule(module));
+    };
+
+    const removeModule = async (moduleId: string) => {
+        await modulesClient.deleteModule(moduleId);
+        dispatch(deleteModule(moduleId));
+    };
+
+    const saveModule = async (module: Module) => {
+        await modulesClient.updateModule(module);
+        dispatch(updateModule(module));
+    };
+
     return (
         <div>
             <ModulesControls
               moduleName={moduleName}
               setModuleName={setModuleName}
-              addModule={() => {
-                if (!cid) return;
-                dispatch(addModule({ name: moduleName, course: cid }));
-                setModuleName("");
-              }}
+              addModule={
+                  createModuleForCourse
+              }
             />
             <br /><br /><br />
             <ListGroup className="rounded-0" id="wd-modules">
 
                 {modules
-                    .filter((module: Module) => module.course === cid)
                     .map((module: Module) => (
                         <ListGroup.Item className=
                                             "wd-module p-0 mb-5 fs-5 border-gray" key={module._id}>
@@ -65,7 +89,7 @@ export default function Modules() {
                                         onChange={(e) => dispatch(updateModule({ ...module, name: e.target.value }))}
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter") {
-                                                dispatch(updateModule({ ...module, editing: false }));
+                                                saveModule({ ...module, editing: false });
                                             }
                                         }}
                                         defaultValue={module.name}
@@ -73,7 +97,7 @@ export default function Modules() {
                                 )}
                                 <ModuleControlButtons
                                   moduleId={module._id}
-                                  deleteModule={(id) => dispatch(deleteModule(id))}
+                                  deleteModule={(moduleId) => removeModule(moduleId)}
                                   editModule={(id) => dispatch(editModule(id))}
                                 />
                             </div>

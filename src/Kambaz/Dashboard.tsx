@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import { addCourse, deleteCourse, updateCourse, type Course } from "./Courses/reducer";
-import { enrollCourse, unenrollCourse } from "./Courses/enrollmentsReducer";
+import { enrollCourse, unenrollCourse, setEnrollments } from "./Courses/enrollmentsReducer";
+import * as enrollmentsClient from "./Courses/enrollmentsClient";
 import React from "react";
 
 interface RootState {
@@ -23,9 +24,16 @@ export default function Dashboard() {
     const [showAll, setShowAll] = React.useState(false);
 
     const userId = currentUser?._id;
+    React.useEffect(()=>{
+    if(currentUser){
+      enrollmentsClient.fetchEnrollmentsForUser(currentUser._id).then(data=>dispatch(setEnrollments(data)));
+    }
+  }, [currentUser]);
+
     const enrolledSet = new Set(enrollments.filter(e=> e.user===userId).map(e=>e.course));
 
-    const filteredCourses = !currentUser || showAll ? courses : courses.filter(c=>enrolledSet.has(c._id));
+    // The server already returns courses filtered by the current user's enrollments
+    const filteredCourses = courses;
     return (
         <div id="wd-dashboard" className="pt-3">
             <h1 id="wd-dashboard-title">Dashboard</h1>
@@ -76,14 +84,12 @@ export default function Dashboard() {
                                             {course.description}
                                         </Card.Text>
                                         <div className="d-flex justify-content-between">
-                                          <Button
-                                            as={Link as any}
+                                          <Link
                                             to={`/Kambaz/Courses/${course._id}/Home`}
-                                            variant="primary"
-                                            className="flex-fill me-2"
+                                            className="btn btn-primary flex-fill me-2"
                                           >
                                             Go
-                                          </Button>
+                                          </Link>
                                           <Button
                                             variant="warning"
                                             id="wd-edit-course-click"
@@ -98,13 +104,15 @@ export default function Dashboard() {
                                           <Button
                                             variant={enrolledSet.has(course._id)?"danger":"success"}
                                              className="me-2"
-                                             onClick={(event)=>{
+                                             onClick={async (event)=>{
                                                event.preventDefault();
                                                if(!currentUser) return;
                                                if(enrolledSet.has(course._id)){
+                                                 await enrollmentsClient.unenroll({user: userId!, course: course._id});
                                                  dispatch(unenrollCourse({user: userId!, course: course._id}));
                                                }else{
-                                                 dispatch(enrollCourse({user: userId!, course: course._id}));
+                                                 const rec = await enrollmentsClient.enroll({user: userId!, course: course._id});
+                                                 dispatch(enrollCourse(rec));
                                                }
                                              }}
                                           >

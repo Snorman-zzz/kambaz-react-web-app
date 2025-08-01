@@ -23,20 +23,14 @@ const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
   reducers: {
+    setAssignments: (state, { payload }: PayloadAction<Assignment[]>) => {
+      state.assignments = payload;
+    },
     addAssignment: (
       state,
-      { payload }: PayloadAction<Partial<Omit<Assignment, "_id">> & { course: string }>
+      { payload }: PayloadAction<Assignment>
     ) => {
-      const newAssignment: Assignment = {
-        _id: crypto.randomUUID(), // eslint-disable-line no-undef
-        title: payload.title ?? "New Assignment",
-        course: payload.course,
-        description: payload.description ?? "",
-        points: payload.points ?? 100,
-        available: payload.available,
-        due: payload.due,
-      };
-      state.assignments.push(newAssignment);
+      state.assignments.push(payload);
     },
     deleteAssignment: (state, { payload }: PayloadAction<string>) => {
       state.assignments = state.assignments.filter((a) => a._id !== payload);
@@ -49,5 +43,5 @@ const assignmentsSlice = createSlice({
   },
 });
 
-export const { addAssignment, deleteAssignment, updateAssignment } = assignmentsSlice.actions;
+export const { setAssignments, addAssignment, deleteAssignment, updateAssignment } = assignmentsSlice.actions;
 export default assignmentsSlice.reducer; 
