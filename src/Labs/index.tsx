@@ -16,18 +16,24 @@ export default function Labs() {
         <Provider store={store}>
             <div id="wd-labs">
                 <h3 id="wd-student-id">Mingze Yuan</h3>
-                <TOC />
+                <TOC/>
                 <a id="wd-github" href="https://github.com/Snorman-zzz/kambaz-react-web-app">
                     GitHub Repository
                 </a>
-                <Index />
+                <a id="wd-github" href="https://github.com/Snorman-zzz/kambaz-node-server-app">
+                    Backend GitHub Repository
+                </a>
+                <a id="wd-github" href="https://kambaz-node-server-app-2ur0.onrender.com">
+                    root of the server running on Render
+                </a>
+                <Index/>
                 <Routes>
-                    <Route path="/" element={<Navigate to="Lab1" />} />
-                    <Route path="Lab1" element={<Lab1 />} />
-                    <Route path="Lab2/*" element={<Lab2 />} />
-                    <Route path="Lab3/*" element={<Lab3 />} />
-                    <Route path="Lab4/*" element={<Lab4 />} />
-                    <Route path="Lab5/*" element={<Lab5 />} />
+                    <Route path="/" element={<Navigate to="Lab1"/>}/>
+                    <Route path="Lab1" element={<Lab1/>}/>
+                    <Route path="Lab2/*" element={<Lab2/>}/>
+                    <Route path="Lab3/*" element={<Lab3/>}/>
+                    <Route path="Lab4/*" element={<Lab4/>}/>
+                    <Route path="Lab5/*" element={<Lab5/>}/>
                 </Routes>
             </div>
         </Provider>
