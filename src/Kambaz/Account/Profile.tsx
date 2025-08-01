@@ -14,6 +14,7 @@ interface User {
   dob?: string;
   email?: string;
   role?: string;
+  [key: string]: string | undefined;
 }
 
 interface RootState {
@@ -28,8 +29,10 @@ export default function Profile() {
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
 
   const updateProfile = async () => {
-    const updatedProfile = await client.updateUser(profile);
-    dispatch(setCurrentUser(updatedProfile));
+    if (profile) {
+      const updatedProfile = await client.updateUser(profile);
+      dispatch(setCurrentUser(updatedProfile));
+    }
   };
 
   const [profile, setProfile] = useState<User | null>(null);

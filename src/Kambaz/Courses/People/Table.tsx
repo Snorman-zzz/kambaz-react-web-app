@@ -1,7 +1,7 @@
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import { FaUserCircle, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { useParams } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import * as usersClient from "./client";
 import React from "react";
 
@@ -24,7 +24,7 @@ interface RootState {
 
 export default function PeopleTable() {
     const { cid } = useParams();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
     const { users } = useSelector((state: RootState) => state.usersReducer);
     const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
@@ -45,6 +45,7 @@ export default function PeopleTable() {
         usersClient.findAllUsers().then((data) => {
             // For now, we'll use a simple reducer. In a real app, you'd have a usersReducer
             // dispatch(setUsers(data));
+            console.log("Users loaded:", data);
         });
     }, []);
 
@@ -58,12 +59,17 @@ export default function PeopleTable() {
         if (editingUser) {
             await usersClient.updateUser(editingUser._id, form);
         } else {
-            await usersClient.createUser(form);
+            await usersClient.createUser({
+                ...form,
+                lastActivity: "2024-01-01",
+                totalActivity: "00:00:00"
+            });
         }
         setShowModal(false);
         setEditingUser(null);
         // Refresh users
         const updatedUsers = await usersClient.findAllUsers();
+        console.log("Users updated:", updatedUsers);
         // dispatch(setUsers(updatedUsers));
     };
 
@@ -73,6 +79,7 @@ export default function PeopleTable() {
             setDeleteUserId(null);
             // Refresh users
             const updatedUsers = await usersClient.findAllUsers();
+            console.log("Users after delete:", updatedUsers);
             // dispatch(setUsers(updatedUsers));
         }
     };
@@ -119,15 +126,15 @@ export default function PeopleTable() {
                                             className="me-2"
                                             onClick={() => {
                                                 setEditingUser(user);
-                                                setForm({
-                                                    firstName: user.firstName,
-                                                    lastName: user.lastName,
-                                                    loginId: user.loginId,
-                                                    section: user.section,
-                                                    role: user.role,
-                                                    username: user.username || "",
-                                                    email: user.email || ""
-                                                });
+                                                                                setForm({
+                                    firstName: user.firstName,
+                                    lastName: user.lastName,
+                                    loginId: user.loginId,
+                                    section: user.section,
+                                    role: user.role,
+                                    username: (user as any).username || "",
+                                    email: (user as any).email || ""
+                                });
                                                 setShowModal(true);
                                             }}
                                         >

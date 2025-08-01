@@ -8,6 +8,7 @@ import {FormControl} from "react-bootstrap";
 interface User {
     username?: string;
     password?: string;
+    [key: string]: string | undefined;
 }
 
 export default function Signup() {
