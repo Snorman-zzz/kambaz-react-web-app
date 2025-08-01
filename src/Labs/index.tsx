@@ -20,9 +20,11 @@ export default function Labs() {
                 <a id="wd-github" href="https://github.com/Snorman-zzz/kambaz-react-web-app">
                     GitHub Repository
                 </a>
+                <br />
                 <a id="wd-github" href="https://github.com/Snorman-zzz/kambaz-node-server-app">
                     Backend GitHub Repository
                 </a>
+                <br />
                 <a id="wd-github" href="https://kambaz-node-server-app-2ur0.onrender.com">
                     root of the server running on Render
                 </a>
