@@ -1,4 +1,5 @@
-import axios from "axios";
+import { axiosWithCredentials, REMOTE_SERVER } from "../../client";
+
 interface Module {
   _id: string;
   name: string;
@@ -6,9 +7,7 @@ interface Module {
   course?: string;
 }
 
-const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
 const MODULES_API = `${REMOTE_SERVER}/api/modules`;
-const axiosWithCredentials = axios.create({ withCredentials: true });
 
 export const updateModule = async (module: Module) => {
   const { data } = await axiosWithCredentials.put(`${MODULES_API}/${module._id}`, module);

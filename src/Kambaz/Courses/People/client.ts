@@ -1,7 +1,6 @@
-import axios from "axios";
+import { axiosWithCredentials, REMOTE_SERVER } from "../../client";
 
-const REMOTE = import.meta.env.VITE_REMOTE_SERVER;
-const USERS_API = `${REMOTE}/api/users`;
+const USERS_API = `${REMOTE_SERVER}/api/users`;
 
 export interface User {
   _id: string;
@@ -17,26 +16,26 @@ export interface User {
 }
 
 export const findAllUsers = async () => {
-  const { data } = await axios.get<User[]>(USERS_API);
+  const { data } = await axiosWithCredentials.get<User[]>(USERS_API);
   return data;
 };
 
 export const findUserById = async (userId: string) => {
-  const { data } = await axios.get<User>(`${USERS_API}/${userId}`);
+  const { data } = await axiosWithCredentials.get<User>(`${USERS_API}/${userId}`);
   return data;
 };
 
 export const createUser = async (user: Omit<User, "_id">) => {
-  const { data } = await axios.post<User>(USERS_API, user);
+  const { data } = await axiosWithCredentials.post<User>(USERS_API, user);
   return data;
 };
 
 export const updateUser = async (userId: string, updates: Partial<User>) => {
-  const { data } = await axios.put<User>(`${USERS_API}/${userId}`, updates);
+  const { data } = await axiosWithCredentials.put<User>(`${USERS_API}/${userId}`, updates);
   return data;
 };
 
 export const deleteUser = async (userId: string) => {
-    const response = await axios.delete( `${USERS_API}/${userId}` );
+    const response = await axiosWithCredentials.delete( `${USERS_API}/${userId}` );
     return response.data;
 };

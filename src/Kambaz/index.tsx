@@ -21,7 +21,6 @@ export default function Kambaz() {
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
     type EnrollableCourse = Course & { enrolled?: boolean };
     const [courses, setCourses] = useState<EnrollableCourse[]>([]);
-    const [enrolling, setEnrolling] = useState<boolean>(false);
     const addNewCourse = async (course: Pick<Course, "name" | "description">) => {
         try {
             const newCourse = await courseClient.createCourse(course);
@@ -64,41 +63,11 @@ export default function Kambaz() {
         }
     };
 
-    const fetchCourses = async () => {
-        try {
-            if (!currentUser) { setCourses([]); return; }
-            const allCourses: EnrollableCourse[] = await courseClient.fetchAllCourses();
-            const userId = String((currentUser as { _id?: string })._id || "");
-            const enrolledCourses: EnrollableCourse[] = await userClient.findCoursesForUser(userId);
-            const courses = allCourses.map((c: EnrollableCourse) => (
-                enrolledCourses.find((ec) => ec._id === c._id)
-                    ? { ...c, enrolled: true }
-                    : c
-            ));
-            setCourses(courses);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
-    const updateEnrollment = async (courseId: string, enrolled: boolean) => {
-        if (!currentUser) return;
-        const userId = String((currentUser as { _id?: string })._id || "");
-        if (enrolled) {
-            await userClient.enrollIntoCourse(userId, courseId);
-        } else {
-            await userClient.unenrollFromCourse(userId, courseId);
-        }
-        setCourses(prev => prev.map(c => c._id === courseId ? { ...c, enrolled } : c));
-    };
 
     useEffect(() => {
-        if (enrolling) {
-            fetchCourses();
-        } else {
-            findCoursesForUser();
-        }
-    }, [currentUser, enrolling]);
+        findCoursesForUser();
+    }, [currentUser]);
 
     return (
         <Session>
@@ -122,7 +91,7 @@ export default function Kambaz() {
                         <Routes>
                             <Route path="/" element={<Navigate to="/Kambaz/Account"/>}/>
                             <Route path="/Account/*" element={<Account/>}/>
-                            <Route path="/Dashboard" element={<Dashboard enrolling={enrolling} setEnrolling={setEnrolling} updateEnrollment={updateEnrollment} />}/>
+                            <Route path="/Dashboard" element={<Dashboard />}/>
                             <Route path="/Courses/:cid/*" element={<Courses />} />
                             <Route path="/Calendar" element={<h1>Calendar</h1>} />
                             <Route path="/Inbox" element={<h1>Inbox</h1>} />

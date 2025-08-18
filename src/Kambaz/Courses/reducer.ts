@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import coursesData from "../Database/courses.json";
 
 export interface Course {
   _id: string;
@@ -12,7 +11,7 @@ interface CoursesState {
 }
 
 const initialState: CoursesState = {
-  courses: coursesData as Course[],
+  courses: [],
 };
 
 const coursesSlice = createSlice({
@@ -38,8 +37,11 @@ const coursesSlice = createSlice({
         c._id === payload._id ? { ...c, ...payload } : c
       );
     },
+    setCourses: (state, { payload }: PayloadAction<Course[]>) => {
+      state.courses = payload;
+    },
   },
 });
 
-export const { addCourse, deleteCourse, updateCourse } = coursesSlice.actions;
+export const { addCourse, deleteCourse, updateCourse, setCourses } = coursesSlice.actions;
 export default coursesSlice.reducer; 

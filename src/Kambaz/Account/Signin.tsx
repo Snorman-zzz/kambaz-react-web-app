@@ -10,11 +10,20 @@ export default function Signin() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const [error, setError] = useState<string | null>(null);
     const signin = async () => {
-        const user = await client.signin(credentials);
-        if (!user) return;
-        dispatch(setCurrentUser(user));
-        navigate("/Kambaz/Dashboard");
+        setError(null);
+        try {
+            const user = await client.signin(credentials);
+            if (!user) {
+                setError("Invalid username or password");
+                return;
+            }
+            dispatch(setCurrentUser(user));
+            navigate("/Kambaz/Dashboard");
+        } catch (e) {
+            setError("Signin failed. Please try again later.");
+        }
     };
 
     return (
@@ -40,6 +49,9 @@ export default function Signin() {
                         setCredentials({ ...credentials, password: e.target.value })
                     }
                 />
+                {error && (
+                    <div className="text-danger mb-2" role="alert">{error}</div>
+                )}
                 <Button
                     id="wd-signin-btn"
                     variant="primary"

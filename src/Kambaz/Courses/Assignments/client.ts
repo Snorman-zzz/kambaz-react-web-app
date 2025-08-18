@@ -1,12 +1,11 @@
-import axios from "axios";
 import type { Assignment } from "./reducer";
+import { axiosWithCredentials, REMOTE_SERVER } from "../../client";
 
-const REMOTE = import.meta.env.VITE_REMOTE_SERVER;
-const COURSES = `${REMOTE}/api/courses`;
-const ASSIGN = `${REMOTE}/api/assignments`;
+const COURSES = `${REMOTE_SERVER}/api/courses`;
+const ASSIGN = `${REMOTE_SERVER}/api/assignments`;
 
 export const findAssignmentsForCourse = async (cid: string) => {
-  const { data } = await axios.get<Assignment[]>(`${COURSES}/${cid}/assignments`);
+  const { data } = await axiosWithCredentials.get<Assignment[]>(`${COURSES}/${cid}/assignments`);
   return data;
 };
 
@@ -14,7 +13,7 @@ export const createAssignmentForCourse = async (
   cid: string,
   assignment: Omit<Assignment, "_id" | "course">
 ) => {
-  const { data } = await axios.post<Assignment>(
+  const { data } = await axiosWithCredentials.post<Assignment>(
     `${COURSES}/${cid}/assignments`,
     assignment
   );
@@ -22,7 +21,7 @@ export const createAssignmentForCourse = async (
 };
 
 export const updateAssignment = async (assignment: Assignment) => {
-  const { data } = await axios.put<Assignment>(
+  const { data } = await axiosWithCredentials.put<Assignment>(
     `${ASSIGN}/${assignment._id}`,
     assignment
   );
@@ -30,5 +29,5 @@ export const updateAssignment = async (assignment: Assignment) => {
 };
 
 export const deleteAssignment = async (aid: string) => {
-  await axios.delete(`${ASSIGN}/${aid}`);
+  await axiosWithCredentials.delete(`${ASSIGN}/${aid}`);
 };
