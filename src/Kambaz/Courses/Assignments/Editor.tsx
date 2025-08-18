@@ -55,7 +55,7 @@ export default function AssignmentEditor() {
         <Form id="wd-assignments-editor" className="pt-2">
             <Form.Group className="mb-3" controlId="wd-name">
                 <Form.Label>Assignment Name</Form.Label>
-                <Form.Control value={form.title} />
+                <Form.Control value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </Form.Group>
 
             <Form.Group className="mb-4" controlId="wd-description">

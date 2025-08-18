@@ -57,8 +57,10 @@ export default function Dashboard() {
                             .then((data) => dispatch(setCourses(data)));
                         }}> Add </button>
                 <button className="btn btn-warning float-end me-2"
-                        onClick={() => {
-                          dispatch(updateCourse(courseForm));
+                        onClick={async () => {
+                          await coursesClient.updateCourse(courseForm);
+                          const data = await coursesClient.fetchAllCourses();
+                          dispatch(setCourses(data));
                         }} id="wd-update-course-click">
                     Update
                 </button>
@@ -130,9 +132,11 @@ export default function Dashboard() {
                                           <Button
                                             variant="danger"
                                             id="wd-delete-course-click"
-                                            onClick={(event) => {
+                                            onClick={async (event) => {
                                               event.preventDefault();
-                                              dispatch(deleteCourse(course._id));
+                                              await coursesClient.deleteCourse(course._id);
+                                              const data = await coursesClient.fetchAllCourses();
+                                              dispatch(setCourses(data));
                                             }}
                                           >
                                             Delete
