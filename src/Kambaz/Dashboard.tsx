@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { deleteCourse, updateCourse, setCourses, type Course } from "./Courses/reducer";
+import { setCourses, type Course } from "./Courses/reducer";
 import * as coursesClient from "./Courses/client";
 import { enrollCourse, unenrollCourse, setEnrollments } from "./Courses/enrollmentsReducer";
 import * as enrollmentsClient from "./Courses/enrollmentsClient";
