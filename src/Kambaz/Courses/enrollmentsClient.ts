@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const REMOTE = import.meta.env.VITE_REMOTE_SERVER;
+const REMOTE = import.meta.env.VITE_REMOTE_SERVER || "http://localhost:4000";
 const ENROLL_URL = `${REMOTE}/api/enrollments`;
 const USER_URL = `${REMOTE}/api/users`;
 

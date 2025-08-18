@@ -13,7 +13,7 @@ interface User {
 }
 
 const axiosWithCredentials = axios.create({ withCredentials: true });
-export const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
+export const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER || "http://localhost:4000";
 export const USERS_API = `${REMOTE_SERVER}/api/users`;
 
 export const findMyCourses = async () => {
@@ -22,8 +22,15 @@ export const findMyCourses = async () => {
 };
 
 export const signin = async (credentials: Credentials) => {
-    const response = await axiosWithCredentials.post( `${USERS_API}/signin`, credentials );
-    return response.data;
+    try {
+        const response = await axiosWithCredentials.post(`${USERS_API}/signin`, credentials);
+        return response.data;
+    } catch (e: any) {
+        if (e?.response?.status === 401) {
+            return null;
+        }
+        throw e;
+    }
 };
 
 export const profile = async () => {
@@ -52,3 +59,9 @@ export const createCourse = async (course: Course) => {
     const { data } = await axiosWithCredentials.post(`${USERS_API}/current/courses`, course);
     return data;
 };
+
+export const findAllUsers = async () => {
+    const response = await axiosWithCredentials.get(USERS_API);
+    return response.data;
+};
+

@@ -4,7 +4,9 @@ import { useSelector } from "react-redux";
 
 interface RootState {
   accountReducer: {
-    currentUser: unknown | null;
+    currentUser: {
+      role?: string;
+    } | null;
   };
 }
 
@@ -16,6 +18,7 @@ export default function AccountNavigation() {
     Signin: "/Kambaz/Account/Signin",
     Signup: "/Kambaz/Account/Signup",
     Profile: "/Kambaz/Account/Profile",
+    Users: "/Kambaz/Account/Users",
   };
 
   const visiblePages = currentUser ? ["Profile"] : ["Signin", "Signup"];
@@ -35,6 +38,15 @@ export default function AccountNavigation() {
           </ListGroup.Item>
         );
       })}
+      {currentUser && currentUser.role === "ADMIN" && (
+        <ListGroup.Item
+          as={Link}
+          to="/Kambaz/Account/Users"
+          className={`border-0 ${pathname.startsWith("/Kambaz/Account/Users") ? "active" : "text-danger"}`}
+        >
+          Users
+        </ListGroup.Item>
+      )}
     </ListGroup>
   );
 } 

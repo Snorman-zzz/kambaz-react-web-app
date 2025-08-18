@@ -4,6 +4,7 @@ import Profile from "./Profile.tsx";
 import Signup from "./Signup.tsx";
 import AccountNavigation from "./Navigation";
 import { useSelector } from "react-redux";
+import Users from "./Users.tsx";
 
 interface RootState {
   accountReducer: {
@@ -28,6 +29,7 @@ export default function Account() {
           <Route path="/Signin" element={<Signin />} />
           <Route path="/Signup" element={<Signup />} />
           <Route path="/Profile" element={<Profile />} />
+            <Route path="/Users" element={<Users />} />
         </Routes>
       </div>
     </div>

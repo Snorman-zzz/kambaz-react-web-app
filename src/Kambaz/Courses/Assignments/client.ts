@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { Assignment } from "./reducer";
 
-const REMOTE = import.meta.env.VITE_REMOTE_SERVER;
+const REMOTE = import.meta.env.VITE_REMOTE_SERVER || "http://localhost:4000";
 const COURSES = `${REMOTE}/api/courses`;
 const ASSIGN = `${REMOTE}/api/assignments`;
 

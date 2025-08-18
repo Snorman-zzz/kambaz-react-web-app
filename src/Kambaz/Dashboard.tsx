@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Row, Col, Card, Button, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
-import { addCourse, deleteCourse, updateCourse, type Course } from "./Courses/reducer";
+import { addCourse, deleteCourse, updateCourse, setCourses, type Course } from "./Courses/reducer";
+import * as coursesClient from "./Courses/client";
 import { enrollCourse, unenrollCourse, setEnrollments } from "./Courses/enrollmentsReducer";
 import * as enrollmentsClient from "./Courses/enrollmentsClient";
 import React from "react";
@@ -24,11 +25,16 @@ export default function Dashboard() {
     const [showAll, setShowAll] = React.useState(false);
 
     const userId = currentUser?._id;
-    React.useEffect(()=>{
-    if(currentUser){
-      enrollmentsClient.fetchEnrollmentsForUser(currentUser._id).then(data=>dispatch(setEnrollments(data)));
-    }
-  }, [currentUser]);
+    React.useEffect(() => {
+      coursesClient.fetchAllCourses().then((data) => dispatch(setCourses(data)));
+    }, [dispatch]);
+    React.useEffect(() => {
+      if (currentUser) {
+        enrollmentsClient
+          .fetchEnrollmentsForUser(currentUser._id)
+          .then((data) => dispatch(setEnrollments(data)));
+      }
+    }, [currentUser, dispatch]);
 
     const enrolledSet = new Set(enrollments.filter(e=> e.user===userId).map(e=>e.course));
 
@@ -45,11 +51,17 @@ export default function Dashboard() {
                 <button className="btn btn-primary float-end"
                         id="wd-add-new-course-click"
                         onClick={() => {
-                          dispatch(addCourse({ name: courseForm.name, description: courseForm.description }));
+                          coursesClient
+                            .createCourse({ name: courseForm.name, description: courseForm.description })
+                            .then(() => coursesClient.fetchAllCourses())
+                            .then((data) => dispatch(setCourses(data)));
                         }}> Add </button>
                 <button className="btn btn-warning float-end me-2"
                         onClick={() => {
-                          dispatch(updateCourse(courseForm));
+                          coursesClient
+                            .updateCourse(courseForm)
+                            .then(() => coursesClient.fetchAllCourses())
+                            .then((data) => dispatch(setCourses(data)));
                         }} id="wd-update-course-click">
                     Update
                 </button>
@@ -123,7 +135,10 @@ export default function Dashboard() {
                                             id="wd-delete-course-click"
                                             onClick={(event) => {
                                               event.preventDefault();
-                                              dispatch(deleteCourse(course._id));
+                                              coursesClient
+                                                .deleteCourse(course._id)
+                                                .then(() => coursesClient.fetchAllCourses())
+                                                .then((data) => dispatch(setCourses(data)));
                                             }}
                                           >
                                             Delete

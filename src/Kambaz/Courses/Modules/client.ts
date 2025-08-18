@@ -6,7 +6,7 @@ interface Module {
   course?: string;
 }
 
-const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER;
+const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER || "http://localhost:4000";
 const MODULES_API = `${REMOTE_SERVER}/api/modules`;
 
 export const updateModule = async (module: Module) => {

@@ -1,6 +1,5 @@
 import { Table, Button, Modal, Form } from "react-bootstrap";
 import { FaUserCircle, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
-import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import * as usersClient from "./client";
 import React from "react";
@@ -17,16 +16,14 @@ interface User {
 }
 
 interface RootState {
-    usersReducer: { users: User[] };
-    enrollmentsReducer: { enrollments: { user: string; course: string }[] };
     accountReducer: { currentUser: { role?: string } | null };
 }
 
-export default function PeopleTable() {
-    const { cid } = useParams();
-    // const dispatch = useDispatch();
-    const { users } = useSelector((state: RootState) => state.usersReducer);
-    const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
+interface PeopleTableProps {
+    users?: User[];
+}
+
+export default function PeopleTable({ users = [] }: PeopleTableProps) {
     const { currentUser } = useSelector((state: RootState) => state.accountReducer);
     const [showModal, setShowModal] = React.useState(false);
     const [editingUser, setEditingUser] = React.useState<User | null>(null);
@@ -41,19 +38,7 @@ export default function PeopleTable() {
         email: ""
     });
 
-    React.useEffect(() => {
-        usersClient.findAllUsers().then((data) => {
-            // For now, we'll use a simple reducer. In a real app, you'd have a usersReducer
-            // dispatch(setUsers(data));
-            console.log("Users loaded:", data);
-        });
-    }, []);
-
     const canEdit = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN";
-
-    const filteredUsers = users.filter((usr) =>
-        enrollments.some((enr) => enr.user === usr._id && enr.course === cid)
-    );
 
     const handleSave = async () => {
         if (editingUser) {
@@ -106,7 +91,7 @@ export default function PeopleTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredUsers.map((user) => (
+                    {users.map((user) => (
                             <tr key={user._id}>
                                 <td className="wd-full-name text-nowrap">
                                     <FaUserCircle className="me-2 fs-1 text-secondary" />
