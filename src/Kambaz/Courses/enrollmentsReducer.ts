@@ -1,9 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import enrollmentsData from "../Database/enrollments.json";
 
 interface Enrollment {
   user: string;
   course: string;
+  _id?: string;
 }
 
 interface EnrollmentsState {
@@ -11,7 +11,7 @@ interface EnrollmentsState {
 }
 
 const initialState: EnrollmentsState = {
-  enrollments: enrollmentsData as Enrollment[],
+  enrollments: [],
 };
 
 const enrollmentsSlice = createSlice({
