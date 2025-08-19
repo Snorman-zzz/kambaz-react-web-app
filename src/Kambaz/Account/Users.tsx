@@ -79,16 +79,20 @@ export default function Users() {
 
     // Create new user with default data
     const createUser = async () => {
-        const newUser = await client.createUser({
-            firstName: "New",
-            lastName: `User${users.length + 1}`,
-            username: `newuser${Date.now()}`,
-            password: "password123",
-            email: `email${users.length + 1}@neu.edu`,
-            section: "S101",
-            role: "STUDENT",
-        });
-        setUsers([...users, newUser]);
+        try {
+            const newUser = await client.createUser({
+                firstName: "New",
+                lastName: `User${users.length + 1}`,
+                username: `newuser${Date.now()}`,
+                password: "password123",
+                email: `email${users.length + 1}@neu.edu`,
+                section: "S101",
+                role: "STUDENT",
+            });
+            setUsers([...users, newUser]);
+        } catch (error) {
+            console.error("Error creating user:", error);
+        }
     };
 
 
@@ -123,6 +127,20 @@ export default function Users() {
                 <option value="ADMIN">Administrators</option>
             </select>
 
-            <PeopleTable users={users} fetchUsers={fetchUsers} />
+            <PeopleTable 
+                users={users} 
+                fetchUsers={() => {
+                    // If filters are applied, maintain them
+                    if (name && role) {
+                        filterUsersByName(name);
+                    } else if (role) {
+                        filterUsersByRole(role);
+                    } else if (name) {
+                        filterUsersByName(name);
+                    } else {
+                        fetchUsers();
+                    }
+                }} 
+            />
         </div>
     );}

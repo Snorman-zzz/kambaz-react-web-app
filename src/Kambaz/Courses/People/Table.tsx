@@ -40,35 +40,73 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: Peopl
         username: "",
         email: ""
     });
+    const [formErrors, setFormErrors] = React.useState<{[key: string]: string}>({});
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
 
     const canEdit = currentUser?.role === "FACULTY" || currentUser?.role === "ADMIN";
 
+    const validateForm = () => {
+        const errors: {[key: string]: string} = {};
+        
+        if (!form.firstName.trim()) errors.firstName = "First name is required";
+        if (!form.lastName.trim()) errors.lastName = "Last name is required";
+        if (!form.username.trim()) errors.username = "Username is required";
+        if (!form.email.trim()) errors.email = "Email is required";
+        else if (!/\S+@\S+\.\S+/.test(form.email)) errors.email = "Email is invalid";
+        if (!form.loginId.trim()) errors.loginId = "Login ID is required";
+        if (!form.section.trim()) errors.section = "Section is required";
+        
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSave = async () => {
-        if (editingUser) {
-            await usersClient.updateUser(editingUser._id, form);
-        } else {
-            await usersClient.createUser({
-                ...form,
-                lastActivity: "2024-01-01",
-                totalActivity: "00:00:00"
+        if (!validateForm()) return;
+        
+        setIsSubmitting(true);
+        try {
+            if (editingUser) {
+                await usersClient.updateUser(editingUser._id, form);
+            } else {
+                await usersClient.createUser({
+                    ...form,
+                    password: "password123", // Default password for new users
+                    lastActivity: "2024-01-01",
+                    totalActivity: "00:00:00"
+                });
+            }
+            setShowModal(false);
+            setEditingUser(null);
+            setForm({
+                firstName: "",
+                lastName: "",
+                loginId: "",
+                section: "",
+                role: "STUDENT",
+                username: "",
+                email: ""
             });
+            setFormErrors({});
+            fetchUsers();
+        } catch (error: any) {
+            console.error("Error saving user:", error);
+            if (error.response?.status === 400 && error.response?.data?.message?.includes("username")) {
+                setFormErrors({ username: "Username already exists" });
+            }
+        } finally {
+            setIsSubmitting(false);
         }
-        setShowModal(false);
-        setEditingUser(null);
-        // Refresh users
-        const updatedUsers = await usersClient.findAllUsers();
-        console.log("Users updated:", updatedUsers);
-        // dispatch(setUsers(updatedUsers));
     };
 
     const handleDelete = async () => {
         if (deleteUserId) {
-            await usersClient.deleteUser(deleteUserId);
-            setDeleteUserId(null);
-            // Refresh users
-            const updatedUsers = await usersClient.findAllUsers();
-            console.log("Users after delete:", updatedUsers);
-            // dispatch(setUsers(updatedUsers));
+            try {
+                await usersClient.deleteUser(deleteUserId);
+                setDeleteUserId(null);
+                fetchUsers();
+            } catch (error) {
+                console.error("Error deleting user:", error);
+            }
         }
     };
 
@@ -158,14 +196,22 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: Peopl
                             <Form.Control
                                 value={form.firstName}
                                 onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                                isInvalid={!!formErrors.firstName}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {formErrors.firstName}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Last Name</Form.Label>
                             <Form.Control
                                 value={form.lastName}
                                 onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                                isInvalid={!!formErrors.lastName}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {formErrors.lastName}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Login ID</Form.Label>
@@ -197,14 +243,22 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: Peopl
                             <Form.Control
                                 value={form.username}
                                 onChange={(e) => setForm({ ...form, username: e.target.value })}
+                                isInvalid={!!formErrors.username}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {formErrors.username}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Email</Form.Label>
                             <Form.Control
                                 value={form.email}
                                 onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                isInvalid={!!formErrors.email}
                             />
+                            <Form.Control.Feedback type="invalid">
+                                {formErrors.email}
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Form>
                 </Modal.Body>
@@ -212,8 +266,8 @@ export default function PeopleTable({ users = [], fetchUsers = () => {} }: Peopl
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleSave}>
-                        Save
+                    <Button variant="primary" onClick={handleSave} disabled={isSubmitting}>
+                        {isSubmitting ? "Saving..." : "Save"}
                     </Button>
                 </Modal.Footer>
             </Modal>
