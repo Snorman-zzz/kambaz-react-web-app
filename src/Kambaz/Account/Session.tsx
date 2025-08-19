@@ -7,10 +7,17 @@ export default function Session({ children }: { children: any }) {
     const dispatch = useDispatch();
     const fetchProfile = async () => {
         try {
+            console.log("=== SESSION DEBUG ===");
+            console.log("Attempting to fetch profile...");
             const currentUser = await client.profile();
+            console.log("Profile fetch successful:", currentUser);
             dispatch(setCurrentUser(currentUser));
         } catch (err: any) {
-            console.error(err);
+            console.error("Profile fetch failed:", err);
+            console.error("Error status:", err.response?.status);
+            console.error("Error data:", err.response?.data);
+            // Don't set current user if profile fetch fails
+            dispatch(setCurrentUser(null));
         }
         setPending(false);
     };
