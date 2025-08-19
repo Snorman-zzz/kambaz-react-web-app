@@ -123,19 +123,42 @@ export default function Dashboard() {
                                              className="me-2"
                                              onClick={async (event)=>{
                                                event.preventDefault();
-                                               if(!currentUser) return;
+                                               if(!currentUser) {
+                                                 alert("Please sign in to enroll in courses.");
+                                                 return;
+                                               }
+                                               
+                                               console.log("=== ENROLLMENT DEBUG ===");
+                                               console.log("User ID:", userId);
+                                               console.log("Course ID:", course._id);
+                                               console.log("Current User:", currentUser);
+                                               console.log("Current enrolled set:", enrolledSet);
+                                               console.log("Is enrolled:", enrolledSet.has(course._id));
+                                               console.log("Current enrollments state:", enrollments);
                                                
                                                try {
                                                  if(enrolledSet.has(course._id)){
-                                                   await enrollmentsClient.unenroll({user: userId!, course: course._id});
+                                                   console.log("Attempting to unenroll...");
+                                                   const result = await enrollmentsClient.unenroll({user: userId!, course: course._id});
+                                                   console.log("Unenroll API result:", result);
                                                    dispatch(unenrollCourse({user: userId!, course: course._id}));
+                                                   console.log("Unenroll action dispatched");
                                                  }else{
+                                                   console.log("Attempting to enroll...");
                                                    const rec = await enrollmentsClient.enroll({user: userId!, course: course._id});
+                                                   console.log("Enroll API result:", rec);
                                                    dispatch(enrollCourse(rec));
+                                                   console.log("Enroll action dispatched");
                                                  }
                                                } catch (error: any) {
                                                  console.error("Enrollment operation failed:", error);
-                                                 alert(error.response?.data?.message || "Enrollment operation failed. Please try again.");
+                                                 console.error("Error response:", error.response?.data);
+                                                 if (error.response?.status === 401) {
+                                                   alert("Authentication session expired. Please sign in again.");
+                                                   window.location.href = "/Kambaz/Account/Signin";
+                                                 } else {
+                                                   alert(error.response?.data?.message || "Enrollment operation failed. Please try again.");
+                                                 }
                                                }
                                              }}
                                           >
