@@ -118,12 +118,18 @@ export default function Dashboard() {
                                              onClick={async (event)=>{
                                                event.preventDefault();
                                                if(!currentUser) return;
-                                               if(enrolledSet.has(course._id)){
-                                                 await enrollmentsClient.unenroll({user: userId!, course: course._id});
-                                                 dispatch(unenrollCourse({user: userId!, course: course._id}));
-                                               }else{
-                                                 const rec = await enrollmentsClient.enroll({user: userId!, course: course._id});
-                                                 dispatch(enrollCourse(rec));
+                                               
+                                               try {
+                                                 if(enrolledSet.has(course._id)){
+                                                   await enrollmentsClient.unenroll({user: userId!, course: course._id});
+                                                   dispatch(unenrollCourse({user: userId!, course: course._id}));
+                                                 }else{
+                                                   const rec = await enrollmentsClient.enroll({user: userId!, course: course._id});
+                                                   dispatch(enrollCourse(rec));
+                                                 }
+                                               } catch (error: any) {
+                                                 console.error("Enrollment operation failed:", error);
+                                                 alert(error.response?.data?.message || "Enrollment operation failed. Please try again.");
                                                }
                                              }}
                                           >
