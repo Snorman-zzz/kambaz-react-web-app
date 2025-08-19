@@ -37,6 +37,20 @@ export default function Dashboard() {
     }, [currentUser, dispatch]);
 
     const enrolledSet = new Set(enrollments.filter(e=> e.user===userId).map(e=>e.course));
+    
+    // Debug function to check session
+    const checkSession = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_REMOTE_SERVER || "https://kambaz-backend-4bo9.onrender.com"}/api/debug/session`, {
+                credentials: 'include'
+            });
+            const sessionData = await response.json();
+            console.log("=== SESSION DEBUG FROM SERVER ===");
+            console.log("Session response:", sessionData);
+        } catch (error) {
+            console.error("Session check failed:", error);
+        }
+    };
 
     // The server already returns courses filtered by the current user's enrollments
     const filteredCourses = courses;
@@ -45,6 +59,9 @@ export default function Dashboard() {
             <h1 id="wd-dashboard-title">Dashboard</h1>
             <hr/>
             <h5>New Course
+                <button className="btn btn-warning float-end me-2" onClick={checkSession}>
+                   Debug Session
+                </button>
                 <button className="btn btn-info float-end me-2" onClick={()=>setShowAll(!showAll)}>
                    {showAll?"My Enrollments":"All Enrollments"}
                 </button>
