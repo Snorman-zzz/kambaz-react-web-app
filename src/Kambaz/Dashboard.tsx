@@ -85,7 +85,11 @@ export default function Dashboard() {
                                                   "/images/reactjs.jpg" variant=
                                                   "top" width=
                                                   "100%" height={160}/>
-                                    <Card.Body>
+                                </Link>
+                                <Card.Body className="d-flex flex-column">
+                                    <Link
+                                        to={`/Kambaz/Courses/${course._id}/Home`}
+                                        className="text-decoration-none text-dark">
                                         <Card.Title className="wd-dashboard-course-title text-nowrap overflow-hidden">
                                             {course.name}
                                         </Card.Title>
@@ -94,6 +98,8 @@ export default function Dashboard() {
                                             style={{height: "100px"}}>
                                             {course.description}
                                         </Card.Text>
+                                    </Link>
+                                    <div className="mt-auto">
                                         <div className="d-flex justify-content-between">
                                           <Link
                                             to={`/Kambaz/Courses/${course._id}/Home`}
@@ -148,8 +154,8 @@ export default function Dashboard() {
                                             Delete
                                           </Button>
                                         </div>
-                                    </Card.Body>
-                                </Link>
+                                    </div>
+                                </Card.Body>
                             </Card>
                         </Col>
                     ))}
