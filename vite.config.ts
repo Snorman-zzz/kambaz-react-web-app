@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: process.env.VITE_REMOTE_SERVER || 'http://localhost:4000',
+        target: (globalThis as any).process?.env?.VITE_REMOTE_SERVER || 'http://localhost:4000',
         changeOrigin: true,
         secure: false,
       },

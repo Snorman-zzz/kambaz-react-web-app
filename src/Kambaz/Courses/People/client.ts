@@ -13,6 +13,7 @@ export interface User {
   totalActivity: string;
   username?: string;
   email?: string;
+  password?: string;
 }
 
 export const findAllUsers = async () => {
