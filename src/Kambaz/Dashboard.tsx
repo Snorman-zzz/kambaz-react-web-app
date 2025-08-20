@@ -24,9 +24,17 @@ export default function Dashboard() {
     const [courseForm, setCourseForm] = React.useState<Course>({ _id: "temp", name: "New Course", description: "New Description" });
     const [showAll, setShowAll] = React.useState(false);
 
+    const getCourseId = (c: any): string | undefined => c?._id || c?.id || c?._id?.$oid || c?.number; // last fallback to number if present
+
     const userId = currentUser?._id;
     React.useEffect(() => {
-      coursesClient.fetchAllCourses().then((data) => dispatch(setCourses(data)));
+      coursesClient.fetchAllCourses().then((data) => {
+        const normalized = (data as any[]).map((c) => ({
+          ...c,
+          _id: getCourseId(c),
+        }));
+        dispatch(setCourses(normalized as unknown as Course[]));
+      });
     }, [dispatch]);
     React.useEffect(() => {
       if (currentUser) {
@@ -93,10 +101,10 @@ export default function Dashboard() {
             <div id="wd-dashboard-courses">
                 <Row xs={1} sm={2} md={3} lg={4} className="g-4 justify-content-start">
                     {filteredCourses.map((course) => (
-                        <Col key={(course as any)._id || (course as any).id} xs="auto" className="wd-dashboard-course" style={{width: "340px"}}>
+                        <Col key={getCourseId(course)} xs="auto" className="wd-dashboard-course" style={{width: "340px"}}>
                             <Card className="h-100">
                                 <Link
-                                    to={`/Kambaz/Courses/${(course as any)._id || (course as any).id}/Home`}
+                                    to={`/Kambaz/Courses/${getCourseId(course)}/Home`}
                                     className="wd-dashboard-course-link text-decoration-none text-dark">
                                     <Card.Img src=
                                                   "/images/reactjs.jpg" variant=
@@ -105,7 +113,7 @@ export default function Dashboard() {
                                 </Link>
                                 <Card.Body className="d-flex flex-column">
                                     <Link
-                                        to={`/Kambaz/Courses/${(course as any)._id || (course as any).id}/Home`}
+                                        to={`/Kambaz/Courses/${getCourseId(course)}/Home`}
                                         className="text-decoration-none text-dark">
                                         <Card.Title className="wd-dashboard-course-title text-nowrap overflow-hidden">
                                             {course.name}
@@ -119,24 +127,13 @@ export default function Dashboard() {
                                     <div className="mt-auto">
                                         <div className="d-flex justify-content-between">
                                           <Link
-                                            to={`/Kambaz/Courses/${(course as any)._id || (course as any).id}/Home`}
+                                            to={`/Kambaz/Courses/${getCourseId(course)}/Home`}
                                             className="btn btn-primary flex-fill me-2"
                                           >
                                             Go
                                           </Link>
                                           <Button
-                                            variant="warning"
-                                            id="wd-edit-course-click"
-                                            className="me-2"
-                                            onClick={(event) => {
-                                              event.preventDefault();
-                                              setCourseForm(course);
-                                            }}
-                                          >
-                                            Edit
-                                          </Button>
-                                          <Button
-                                            variant={enrolledSet.has(((course as any)._id || (course as any).id))?"danger":"success"}
+                                            variant={enrolledSet.has(getCourseId(course) || "")?"danger":"success"}
                                              className="me-2"
                                              onClick={async (event)=>{
                                                event.preventDefault();
@@ -146,7 +143,9 @@ export default function Dashboard() {
                                                }
                                                
                                                console.log("=== ENROLLMENT DEBUG ===");
-                                               const courseId = (course as any)._id || (course as any).id;
+                                               const courseId = getCourseId(course);
+                                               console.log("Course object:", course);
+                                               console.log("Course keys:", Object.keys(course || {}));
                                                console.log("User ID:", userId);
                                                console.log("Course ID:", courseId);
                                                console.log("Current User:", currentUser);
@@ -201,14 +200,16 @@ export default function Dashboard() {
                                                }
                                              }}
                                           >
-                                            {enrolledSet.has(((course as any)._id || (course as any).id))?"Unenroll":"Enroll"}
+                                            {enrolledSet.has(getCourseId(course) || "")?"Unenroll":"Enroll"}
                                           </Button>
                                           <Button
                                             variant="danger"
                                             id="wd-delete-course-click"
                                             onClick={async (event) => {
                                               event.preventDefault();
-                                              await coursesClient.deleteCourse((course as any)._id || (course as any).id);
+                                              const id = getCourseId(course);
+                                              if (!id) { alert("Missing course id"); return; }
+                                              await coursesClient.deleteCourse(id);
                                               const data = await coursesClient.fetchAllCourses();
                                               dispatch(setCourses(data));
                                             }}
