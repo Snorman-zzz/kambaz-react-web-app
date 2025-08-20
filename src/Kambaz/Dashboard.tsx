@@ -22,7 +22,6 @@ export default function Dashboard() {
     const { enrollments } = useSelector((state: RootState) => state.enrollmentsReducer);
 
     const [courseForm, setCourseForm] = React.useState<Course>({ _id: "temp", name: "New Course", description: "New Description" });
-    const [showAll, setShowAll] = React.useState(false);
 
     const getCourseId = (c: any): string | undefined => c?._id || c?.id || c?._id?.$oid || c?.number; // last fallback to number if present
 
@@ -46,20 +45,6 @@ export default function Dashboard() {
 
     const enrolledSet = new Set(enrollments.filter(e=> e.user===userId).map(e=>e.course));
     
-    // Debug function to check session
-    const checkSession = async () => {
-        try {
-            const response = await fetch(`${import.meta.env.VITE_REMOTE_SERVER || "https://kambaz-backend-4bo9.onrender.com"}/api/debug/session`, {
-                credentials: 'include'
-            });
-            const sessionData = await response.json();
-            console.log("=== SESSION DEBUG FROM SERVER ===");
-            console.log("Session response:", sessionData);
-        } catch (error) {
-            console.error("Session check failed:", error);
-        }
-    };
-
     // The server already returns courses filtered by the current user's enrollments
     const filteredCourses = courses;
     return (
@@ -67,12 +52,6 @@ export default function Dashboard() {
             <h1 id="wd-dashboard-title">Dashboard</h1>
             <hr/>
             <h5>New Course
-                <button className="btn btn-warning float-end me-2" onClick={checkSession}>
-                   Debug Session
-                </button>
-                <button className="btn btn-info float-end me-2" onClick={()=>setShowAll(!showAll)}>
-                   {showAll?"My Enrollments":"All Enrollments"}
-                </button>
                 <button className="btn btn-primary float-end"
                         id="wd-add-new-course-click"
                         onClick={() => {
@@ -133,6 +112,17 @@ export default function Dashboard() {
                                             Go
                                           </Link>
                                           <Button
+                                            variant="warning"
+                                            id="wd-edit-course-click"
+                                            className="me-2"
+                                            onClick={(event) => {
+                                              event.preventDefault();
+                                              setCourseForm(course);
+                                            }}
+                                          >
+                                            Edit
+                                          </Button>
+                                          <Button
                                             variant={enrolledSet.has(getCourseId(course) || "")?"danger":"success"}
                                              className="me-2"
                                              onClick={async (event)=>{
@@ -142,55 +132,21 @@ export default function Dashboard() {
                                                  return;
                                                }
                                                
-                                               console.log("=== ENROLLMENT DEBUG ===");
                                                const courseId = getCourseId(course);
-                                               console.log("Course object:", course);
-                                               console.log("Course keys:", Object.keys(course || {}));
-                                               console.log("User ID:", userId);
-                                               console.log("Course ID:", courseId);
-                                               console.log("Current User:", currentUser);
-                                               console.log("Current enrolled set:", enrolledSet);
-                                               console.log("Is enrolled:", courseId ? enrolledSet.has(courseId) : false);
-                                               console.log("Current enrollments state:", enrollments);
+                                               if(!courseId){
+                                                 alert("This course has no id. Please refresh the page and try again.");
+                                                 return;
+                                               }
                                                
                                                try {
-                                                 // Validate session before enrollment
-                                                 console.log("Validating session before enrollment...");
-                                                 const sessionCheck = await fetch(`${import.meta.env.VITE_REMOTE_SERVER || "https://kambaz-backend-4bo9.onrender.com"}/api/debug/session`, {
-                                                   credentials: 'include'
-                                                 });
-                                                 const sessionData = await sessionCheck.json();
-                                                 console.log("Session validation result:", sessionData);
-                                                 
-                                                 if (!sessionData.isAuthenticated) {
-                                                   alert("Session expired. Please sign in again.");
-                                                   window.location.href = "/Kambaz/Account/Signin";
-                                                   return;
-                                                 }
-                                                 
-                                                 // Small delay to ensure session is fully established
-                                                 await new Promise(resolve => setTimeout(resolve, 100));
-                                                 
-                                                 if(!courseId){
-                                                   alert("This course has no id. Please refresh the page and try again.");
-                                                   return;
-                                                 }
                                                  if(enrolledSet.has(courseId)){
-                                                   console.log("Attempting to unenroll...");
-                                                   const result = await enrollmentsClient.unenroll({user: userId!, course: courseId});
-                                                   console.log("Unenroll API result:", result);
+                                                   await enrollmentsClient.unenroll({user: userId!, course: courseId});
                                                    dispatch(unenrollCourse({user: userId!, course: courseId}));
-                                                   console.log("Unenroll action dispatched");
                                                  }else{
-                                                   console.log("Attempting to enroll...");
                                                    const rec = await enrollmentsClient.enroll({user: userId!, course: courseId});
-                                                   console.log("Enroll API result:", rec);
                                                    dispatch(enrollCourse(rec));
-                                                   console.log("Enroll action dispatched");
                                                  }
                                                } catch (error: any) {
-                                                 console.error("Enrollment operation failed:", error);
-                                                 console.error("Error response:", error.response?.data);
                                                  if (error.response?.status === 401) {
                                                    alert("Authentication session expired. Please sign in again.");
                                                    window.location.href = "/Kambaz/Account/Signin";
