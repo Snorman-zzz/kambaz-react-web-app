@@ -154,6 +154,23 @@ export default function Dashboard() {
                                                console.log("Current enrollments state:", enrollments);
                                                
                                                try {
+                                                 // Validate session before enrollment
+                                                 console.log("Validating session before enrollment...");
+                                                 const sessionCheck = await fetch(`${import.meta.env.VITE_REMOTE_SERVER || "https://kambaz-backend-4bo9.onrender.com"}/api/debug/session`, {
+                                                   credentials: 'include'
+                                                 });
+                                                 const sessionData = await sessionCheck.json();
+                                                 console.log("Session validation result:", sessionData);
+                                                 
+                                                 if (!sessionData.isAuthenticated) {
+                                                   alert("Session expired. Please sign in again.");
+                                                   window.location.href = "/Kambaz/Account/Signin";
+                                                   return;
+                                                 }
+                                                 
+                                                 // Small delay to ensure session is fully established
+                                                 await new Promise(resolve => setTimeout(resolve, 100));
+                                                 
                                                  if(enrolledSet.has(course._id)){
                                                    console.log("Attempting to unenroll...");
                                                    const result = await enrollmentsClient.unenroll({user: userId!, course: course._id});
