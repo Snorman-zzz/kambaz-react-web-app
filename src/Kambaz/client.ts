@@ -1,8 +1,15 @@
 import axios from "axios";
 
-export const REMOTE_SERVER = import.meta.env.VITE_REMOTE_SERVER || "http://localhost:4000";
+// Determine the API base at runtime to avoid third-party cookie issues in production.
+// On Netlify, we proxy requests to the backend so we should use a same-origin relative base.
+const isBrowser = typeof window !== "undefined";
+const isNetlifyHost = isBrowser && /\.netlify\.app$/.test(window.location.hostname);
 
-export const axiosWithCredentials = axios.create({ 
+export const REMOTE_SERVER = isNetlifyHost
+  ? ""
+  : (import.meta.env.VITE_REMOTE_SERVER || "http://localhost:4000");
+
+export const axiosWithCredentials = axios.create({
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
@@ -14,7 +21,9 @@ axiosWithCredentials.interceptors.request.use(
     (config) => {
         console.log(`🚀 ${config.method?.toUpperCase()} ${config.url}`);
         console.log('Request config:', config);
-        console.log('Cookies being sent:', document.cookie);
+        if (isBrowser) {
+            console.log('Cookies being sent:', document.cookie);
+        }
         return config;
     },
     (error) => {
