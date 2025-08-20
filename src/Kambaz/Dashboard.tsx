@@ -93,10 +93,10 @@ export default function Dashboard() {
             <div id="wd-dashboard-courses">
                 <Row xs={1} sm={2} md={3} lg={4} className="g-4 justify-content-start">
                     {filteredCourses.map((course) => (
-                        <Col key={course._id} xs="auto" className="wd-dashboard-course" style={{width: "340px"}}>
+                        <Col key={(course as any)._id || (course as any).id} xs="auto" className="wd-dashboard-course" style={{width: "340px"}}>
                             <Card className="h-100">
                                 <Link
-                                    to={`/Kambaz/Courses/${course._id}/Home`}
+                                    to={`/Kambaz/Courses/${(course as any)._id || (course as any).id}/Home`}
                                     className="wd-dashboard-course-link text-decoration-none text-dark">
                                     <Card.Img src=
                                                   "/images/reactjs.jpg" variant=
@@ -105,7 +105,7 @@ export default function Dashboard() {
                                 </Link>
                                 <Card.Body className="d-flex flex-column">
                                     <Link
-                                        to={`/Kambaz/Courses/${course._id}/Home`}
+                                        to={`/Kambaz/Courses/${(course as any)._id || (course as any).id}/Home`}
                                         className="text-decoration-none text-dark">
                                         <Card.Title className="wd-dashboard-course-title text-nowrap overflow-hidden">
                                             {course.name}
@@ -119,7 +119,7 @@ export default function Dashboard() {
                                     <div className="mt-auto">
                                         <div className="d-flex justify-content-between">
                                           <Link
-                                            to={`/Kambaz/Courses/${course._id}/Home`}
+                                            to={`/Kambaz/Courses/${(course as any)._id || (course as any).id}/Home`}
                                             className="btn btn-primary flex-fill me-2"
                                           >
                                             Go
@@ -136,7 +136,7 @@ export default function Dashboard() {
                                             Edit
                                           </Button>
                                           <Button
-                                            variant={enrolledSet.has(course._id)?"danger":"success"}
+                                            variant={enrolledSet.has(((course as any)._id || (course as any).id))?"danger":"success"}
                                              className="me-2"
                                              onClick={async (event)=>{
                                                event.preventDefault();
@@ -146,11 +146,12 @@ export default function Dashboard() {
                                                }
                                                
                                                console.log("=== ENROLLMENT DEBUG ===");
+                                               const courseId = (course as any)._id || (course as any).id;
                                                console.log("User ID:", userId);
-                                               console.log("Course ID:", course._id);
+                                               console.log("Course ID:", courseId);
                                                console.log("Current User:", currentUser);
                                                console.log("Current enrolled set:", enrolledSet);
-                                               console.log("Is enrolled:", enrolledSet.has(course._id));
+                                               console.log("Is enrolled:", courseId ? enrolledSet.has(courseId) : false);
                                                console.log("Current enrollments state:", enrollments);
                                                
                                                try {
@@ -171,15 +172,19 @@ export default function Dashboard() {
                                                  // Small delay to ensure session is fully established
                                                  await new Promise(resolve => setTimeout(resolve, 100));
                                                  
-                                                 if(enrolledSet.has(course._id)){
+                                                 if(!courseId){
+                                                   alert("This course has no id. Please refresh the page and try again.");
+                                                   return;
+                                                 }
+                                                 if(enrolledSet.has(courseId)){
                                                    console.log("Attempting to unenroll...");
-                                                   const result = await enrollmentsClient.unenroll({user: userId!, course: course._id});
+                                                   const result = await enrollmentsClient.unenroll({user: userId!, course: courseId});
                                                    console.log("Unenroll API result:", result);
-                                                   dispatch(unenrollCourse({user: userId!, course: course._id}));
+                                                   dispatch(unenrollCourse({user: userId!, course: courseId}));
                                                    console.log("Unenroll action dispatched");
                                                  }else{
                                                    console.log("Attempting to enroll...");
-                                                   const rec = await enrollmentsClient.enroll({user: userId!, course: course._id});
+                                                   const rec = await enrollmentsClient.enroll({user: userId!, course: courseId});
                                                    console.log("Enroll API result:", rec);
                                                    dispatch(enrollCourse(rec));
                                                    console.log("Enroll action dispatched");
@@ -196,14 +201,14 @@ export default function Dashboard() {
                                                }
                                              }}
                                           >
-                                            {enrolledSet.has(course._id)?"Unenroll":"Enroll"}
+                                            {enrolledSet.has(((course as any)._id || (course as any).id))?"Unenroll":"Enroll"}
                                           </Button>
                                           <Button
                                             variant="danger"
                                             id="wd-delete-course-click"
                                             onClick={async (event) => {
                                               event.preventDefault();
-                                              await coursesClient.deleteCourse(course._id);
+                                              await coursesClient.deleteCourse((course as any)._id || (course as any).id);
                                               const data = await coursesClient.fetchAllCourses();
                                               dispatch(setCourses(data));
                                             }}
